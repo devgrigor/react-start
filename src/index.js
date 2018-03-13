@@ -48,7 +48,11 @@ class Game extends React.Component {
 				squares: Array(9).fill(null),
 			}],
 			xIsNext: true,
+			value: ''
 		};
+
+		this.handleChange = this.handleChange.bind(this);
+		this.handleSubmit = this.handleSubmit.bind(this);
 	}
 
 	handleClick(i) {
@@ -90,19 +94,62 @@ class Game extends React.Component {
 			status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
 		}
 
+		// This bind works as a arrow function to not loose this as a component, actually to remain a this.state
+		// So this.handleClick.bind(this) equals (i) => this.handleClick(i), also can be done in constructor like this.handleSubmit
+		// NOTE: for handling input values uncontrolled components can be used
 		return (
 			<div className="game">
 				<div className="game-board">
 					<Board  squares={current.squares}
-						onClick={(i) => this.handleClick(i)}  />
+						onClick={this.handleClick.bind(this)}  />
 				</div>
 				<div className="game-info">
 					<div>{ status }</div>
 					<ol>{moves}</ol>
 				</div>
+				<h3>{this.state.value}</h3>
+				<form onSubmit={this.handleSubmit}>
+					<label>
+						Name:
+						<input type="text" value={this.state.value} onChange={this.handleChange} />
+						<textarea value={this.state.value} onChange={this.handleChange} />
+					</label>
+
+					<label>
+						Upload file:
+						<input
+							type="file"
+							ref={input => {
+							  this.fileInput = input;
+							}}
+									/>
+								</label>
+
+					<select value={this.state.value} onChange={this.handleChange}>
+						<option value="grapefruit">Grapefruit</option>
+						<option value="lime">Lime</option>
+						<option value="coconut">Coconut</option>
+						<option value="mango">Mango</option>
+					</select>
+					<input type="submit" value="Submit" />
+				</form>
 			</div>
 		);
 	}
+
+	handleChange(event) {
+		this.setState({value: event.target.value});
+	}
+
+	handleSubmit(event) {
+		event.preventDefault();
+		// TODO: implement file upload at some point and look into ref's of react
+		alert(
+			`Selected file - ${this.fileInput.files[0].name}`
+		);
+
+	}
+
 
 	jumpTo(move) {
 		let history = this.state.history.splice(0);
